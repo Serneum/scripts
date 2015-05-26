@@ -1,0 +1,26 @@
+#!/bin/bash
+
+remote=$(git config --get submit.remote )
+current=$( git rev-parse --symbolic-full-name --abbrev-ref HEAD )
+upstream=$(git rev-parse --symbolic-full-name --abbrev-ref @{u} )
+upstream=${upstream#*/} # trim the leading remote name portion
+
+if [ -z "$remote" ]
+then
+	echo "submit.remote is not set"
+	exit 1
+fi
+
+if [ -z $upstream ]
+then
+	echo "can not determine upstream of current branch"
+	exit 1
+fi
+
+target="$upstream"
+if [ "$upstream" != "$current"  -a "$current" != 'master' -a "$current" != 'trunk' ]
+then
+	target="$target/$current"
+fi
+
+git push "$remote" HEAD:refs/for/$target

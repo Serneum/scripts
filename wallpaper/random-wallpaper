@@ -1,0 +1,17 @@
+#!/bin/bash
+function join {
+ IFS=$1
+ shift
+ echo "$*"
+}
+
+EXTENSIONS=( jpg jpeg bmp png ) 
+EXT_PATTERN=$(join '|' "${EXTENSIONS[@]}" | sed 's@|@\\|@g')
+
+#echo ".*\.\($EXT_PATTERN\)"
+
+while true
+do
+	find "$HOME/Pictures/Wallpapers" -type f \( -iregex ".*\.\($EXT_PATTERN\)" \)|rl|head -n 1|xargs -I{} bash -c "gsettings set org.gnome.desktop.background picture-uri \"file://{}\""
+	sleep $[ ($RANDOM % 1080) + 120 ]s
+done

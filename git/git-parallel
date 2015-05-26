@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# apt-get install parallel
+
+export GIT_PAGER=cat;
+
+if [ $# -eq '0' ]
+then
+    echo >&2 no command given
+    exit 1
+fi
+
+function doGitCmd {
+    local dir=$1
+    shift # pop directory argument
+    source ~/.bash/colors
+    cd "$dir"
+    # echo to stderr since that shows first
+    echo -e "${MAGENTA}${dir}${RESET_COLOR}" >&2
+    git "$@" >&2
+    cd - >/dev/null # switch back to old directory
+}
+
+# locate each git repository, print the pwd and execute given git command within
+#git find-all | while read LINE
+#do
+#    doGitCmd "$LINE" "$@"
+#done
+
+GIT_ARGS=( "$@" )
+
+export -f doGitCmd
+git find-all -0 | \
+        parallel -0 --max-procs 200% --keep-order --group --gnu doGitCmd {} "${GIT_ARGS[@]}"

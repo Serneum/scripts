@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# Update a git repository by fetching new revisions from all potential remotes
+# Then udpate the workspace via fast-forward (printing out the changelog)
+#
+# git config --global alias.up2 "\!$(cat git-up2)"
+
+# test if we are in a git repository
+git rev-parse || exit 1
+
+# update cvs mirror
+git config --get-regexp 'cvsimport.d' >/dev/null && git cvsimport >/dev/null;
+
+#update svn remotes
+git config --get-regexp 'svn-remote.*.url' >/dev/null && git svn fetch --quiet --quiet;
+
+#update hg remotes
+git config --get-regexp 'remote.hg.url' >/dev/null && ( git hg fetch 2>/dev/null || echo "error fetching hg" >&2);
+
+#update git remotes
+git fetch --quiet --all --tags;
+git fetch --quiet --all -p; # don't prune local tags
+
+#update submodeuls if present
+git submodule update
+
+#run gc
+git gc --auto;
+
+# fast-forward the workspace, print out changelog of update if successful
+OLDHEAD=$(git rev-parse --verify HEAD);
+git pull --no-rebase --ff-only -q \
+	&& git --no-pager log --reverse --date='short' --stat=120 --color -C -C -M \
+		--pretty='format:%C(blue)%ad %C(cyan)%ae %C(yellow)%h %Creset%s%n' \
+		"$OLDHEAD".. --

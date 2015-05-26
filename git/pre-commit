@@ -1,0 +1,61 @@
+#!/bin/bash
+#pre-commit
+
+COPYRIGHT="$(git config --get 'precommit.copyright')"
+YEAR="$(date +%Y)"
+commit="" # empty for index, diff command also needs --cached flag
+
+
+## no copyright required
+if [ -z "$COPYRIGHT" ]
+then
+	exit 0
+fi
+
+LOGFILE=/tmp/patchset-created.txt
+function log {
+	: # noop
+#    echo "$@" | tee -a "$LOGFILE"
+}
+
+
+
+#SSH="ssh -p 29418 anthill@localhost"
+function failCopyright {
+	local MSG="Copyright message needs update for current year $YEAR in files:"
+	MSG=$( IFS=$'\n'; echo "$MSG"; echo "$*" )
+	echo "$MSG" >&2
+}
+
+#log "checking for $COPYRIGHT"
+FILES=()
+EXIT=0
+# use piped input so that while loop is in same proc and can modify local vars
+while read FILE; do
+	log "checking $COMMIT:$FILE for $COPYRIGHT and $YEAR"
+	#git --no-pager show "$commit:$FILE" | file - | grep -i --quiet 'text'
+	#if [ "$?" -eq 0 ]
+	#then
+	#	git --no-pager show "$commit:$FILE" | grep -iF --quiet "$COPYRIGHT"
+	#	if [ "$?" -ne 0 ]
+	#	then
+	#		FILES+=( "$FILE" )
+	#		EXIT=1
+	#	fi
+	#fi
+	git --no-pager show "$commit:$FILE" | grep -iF "$COPYRIGHT" | grep --quiet -F $YEAR
+	if [ 0 -eq "${PIPESTATUS[1]}" -a 0 -ne "${PIPESTATUS[2]}" ]
+	then
+		log "$COMMIT:$FILE missing copyright"
+		FILES+=( "$FILE" )
+	fi
+done < <( git diff --cached --diff-filter=AMCR --name-only  )
+
+log "found ${#FILES[@]} files: $FILES"
+
+if [ "${#FILES[@]}" -gt 0 ]
+then
+	failCopyright "${FILES[@]}"
+	log "after review command"
+fi
+exit $EXIT

@@ -1,0 +1,9 @@
+#!/bin/bash
+COLOR_DEPTH=16
+RESOLUTION=1792x1008
+HOST=$1
+USER=$2
+PASSWORD=$3
+MOUNT=disk:Public=$HOME/Public
+
+rdesktop -u $USER -p $PASSWORD -a $COLOR_DEPTH -g $RESOLUTION -r $MOUNT -r clipboard:CLIPBOARD $HOST;
