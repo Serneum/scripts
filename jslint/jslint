@@ -1,0 +1,19 @@
+#!/bin/bash
+JSLINT_JAR=~/.ant/lib/jslint4java.jar
+#JSLINT_CONFIG="--bitwise --browser --eqeqeq --immed --newcap --undef --indent 4"
+JSLINT_CONFIG="--browser --devel --newcap --indent 4 --vars --nomen --sloppy --confusion --white --maxerr 9999 --plusplus --fragment --cap"
+GLOBALS="--predef dojo,dojox,dijit,$,jQuery,bootstrap,navBar,appState,js,util,config,widgets,security,i18n,define"
+ARGS=( "$@" )
+if [ ${#ARGS} -eq 0 ]
+then
+    echo "No files specified"
+    exit 0
+fi
+FILES=$( find "${ARGS[@]}" -type f \( -iname '*.js' -or -iname '*.html' \) -print )
+if [ -z "$FILES" ]
+then
+    echo "no javascript files to scan"
+    exit 0
+fi
+echo -n "$FILES" | tr '\n' '\0' | xargs -0 java -jar "$JSLINT_JAR" $GLOBALS $JSLINT_CONFIG | grep -v '^$'
+exit ${PIPESTATUS[1]}
