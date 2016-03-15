@@ -1,0 +1,16 @@
+#!/bin/bash
+
+git rev-parse || exit 1
+
+#jslint properly handles no files being specified
+DIFFBASE=HEAD
+FILES=$( git diff --diff-filter=AMCR --name-only "$DIFFBASE" -- "$@" )
+if [ -z "$FILES" ]
+then
+	echo "no files to scan"
+	exit 0
+fi
+
+echo "running jslint"
+echo -n "$FILES" | tr '\n' '\0' | xargs -0 jslint
+exit $?
