@@ -11,9 +11,10 @@ git clone https://github.com/Serneum/dotfiles.git .dotfiles
 if [ ! -d ~/.vim ]; then
   mkdir ~/.vim
   git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-  vundle
+  
+  # Prevent the issue where Vim complains about input/output and causes the terminal to need to be closed
+  echo | echo | vim +PluginInstall +qall &>/dev/null
 fi
-brew install ag autojump cheat
 EOF
 
 # Give permissions for the script to the vagrant user
