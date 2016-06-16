@@ -8,9 +8,6 @@ git clone https://github.com/Serneum/settings.git
 
 # Copy over Git settings
 cd ~/settings/git
-sed -i.bak "s/USER_NAME/Chris Rees/g" .gitconfig
-sed -i.bak "s/USER_EMAIL/crees@covermymeds.com/g" .gitconfig
-
 mv .gitconfig ~/.gitconfig
 mv .gitignore ~/.gitignore
 
