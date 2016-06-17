@@ -4,34 +4,17 @@ SETUP_FILE=/home/vagrant/setup.sh
 # the vagrant user
 cat <<EOF > $SETUP_FILE
 # Clone settings repo
-git clone https://github.com/Serneum/dotfiles.git
-
-# Copy over Git settings
-cd ~/dotfiles/git
-mv .gitconfig ~/.gitconfig
-mv .gitignore ~/.gitignore
-
-# Copy over bash settings
-cd ../bash
-mv .bashrc ~/.bashrc
-if [ ! -d ~/.bash ]; then
-  mv .bash ~/
-fi
+git clone --recursive https://github.com/Serneum/dotfiles.git .dotfiles
+./.dotfiles/install
 
 # Set up Vim, Vundle, and install plugins from the .vimrc file
 if [ ! -d ~/.vim ]; then
   mkdir ~/.vim
   git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-  cd ../vim
-  mv .vimrc ~/.vimrc
 
   # Prevent the issue where Vim complains about input/output and causes the terminal to need to be closed
   echo | echo | vim +PluginInstall +qall &>/dev/null
 fi
-
-# Remove the cloned repo
-cd ..
-rm -rf ~/dotfiles
 EOF
 
 # Give permissions for the script to the vagrant user
