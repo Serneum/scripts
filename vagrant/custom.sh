@@ -6,6 +6,9 @@ cat <<EOF > $SETUP_FILE
 # Clone settings repo
 git clone --recursive https://github.com/Serneum/dotfiles.git .dotfiles
 ./.dotfiles/install
+
+# Prevent the issue where Vim complains about input/output and causes the terminal to need to be closed
+echo | echo | vim +PluginInstall +qall &>/dev/null
 EOF
 
 # Give permissions for the script to the vagrant user
