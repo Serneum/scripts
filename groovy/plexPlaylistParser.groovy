@@ -70,7 +70,7 @@ if (options.c) {
 }
 
 if (options.z) {
-    executeOnShell("zip -r * ${outputDir.name}", outputDir.absoluteFile)
+    executeOnShell("zip -r ${outputDir.name} *", outputDir.absoluteFile)
     executeOnShell("mv ${outputDir.absoluteFile}/${outputDir.name}.zip .")
     outputDir.deleteDir()
 }
